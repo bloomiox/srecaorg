@@ -68,15 +68,17 @@ export const COURSES_DATA: Course[] = [
 export const TEAM_DATA: TeamMember[] = [
   {
     id: 1,
-    name: 'Havić Hajrudin',
-    role: 'Osnivač i Predsjednik',
-    imageUrl: 'https://static.klix.ba/media/images/vijesti/b_160923128.jpg?v=1',
+    name: 'Spec. dr. med. Havić Hajrudin',
+    spec: 'Specijalista urgentne medicine',
+    role: 'Osnivač i predsjednik',
+    imageUrl: 'https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/Untitled%20design%20(10).png',
   },
   {
     id: 2,
-    name: 'Amel Mizić',
+    name: 'Spec. dr. med. Amel Mizić',
+    spec: 'Specijalista urgentne medicine',
     role: 'Sekretar',
-    imageUrl: 'https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/unnamed.jpg',
+    imageUrl: 'https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/Untitled%20design%20(11).png',
   },
 ];
 
