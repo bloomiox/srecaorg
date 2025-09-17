@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaLinkedin, FaFacebook } from 'react-icons/fa';
 
 const Footer: React.FC = () => {
   return (
@@ -6,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-xl font-bold mb-2">RESUSBIH - Udruženje Resuscitacijski savjet u BiH</h3>
+            <h3 className="text-xl font-bold mb-2">Udruženje Resuscitacijski savjet u Bosni i Hercegovini</h3>
             <p className="text-sm text-gray-300">Znanje koje spašava živote.</p>
           </div>
           <div>
@@ -17,9 +18,12 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-xl font-bold mb-2">Pratite nas</h3>
             <div className="flex justify-center md:justify-start space-x-4">
-              {/* Add social media icons here if needed */}
-              <a href="#" className="text-gray-300 hover:text-brand-red transition-colors">Facebook</a>
-              <a href="https://www.linkedin.com/company/resusbih" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-brand-red transition-colors">LinkedIn</a>
+              <span className="text-gray-500 cursor-not-allowed">
+                <FaFacebook size={24} />
+              </span>
+              <a href="https://www.linkedin.com/company/resusbih" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-brand-red transition-colors">
+                <FaLinkedin size={24} />
+              </a>
             </div>
           </div>
         </div>
