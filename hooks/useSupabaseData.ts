@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Event, NewsArticle, TeamMember } from '../types';
-import { getEvents, getNews, getTeamMembers } from '../lib/supabase-utils';
+import { getEvents, getNews, getTeamMembers, getSiteSettings } from '../lib/supabase-utils';
 import { EVENTS_DATA, NEWS_DATA, TEAM_DATA } from '../constants';
 
 export const useEvents = () => {
@@ -85,4 +85,26 @@ export const useTeamMembers = () => {
   }, []);
 
   return { teamMembers, loading, error, refetch: () => fetchTeamMembers() };
+};
+
+export const useSiteSettings = () => {
+  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const supabaseSettings = await getSiteSettings();
+        setSettings(supabaseSettings);
+      } catch (err) {
+        console.error('Error loading site settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  return { settings, loading };
 };

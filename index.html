@@ -2,7 +2,7 @@
 <html lang="hr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80" />
+    <link rel="icon" type="image/png" href="/sreca-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sreca - Organizacija za djecu sa invaliditetom</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,6 +19,25 @@
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.6s ease-in-out',
+              'slide-up': 'slideUp 0.5s ease-out',
+              'bounce-gentle': 'bounceGentle 2s infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' }
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(30px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' }
+              },
+              bounceGentle: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' }
+              }
             }
           }
         }
@@ -38,7 +57,7 @@
 }
 </script>
 </head>
-  <body class="bg-brand-gray">
+  <body class="bg-gradient-to-br from-gray-50 to-white">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -25,12 +25,12 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
             onClick={() => handleNavClick(Page.Home)}
           >
             <img 
-              src="https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/RESUSBIH%20LOGO.png" 
-              alt="RESUSBIH Logo" 
+              src="/sreca-logo.png" 
+              alt="Sreca Logo" 
               className="h-12 w-auto"
             />
             <span className="ml-3 text-2xl font-black tracking-wider text-brand-blue">
-              RESUSBIH
+              SREĆA
             </span>
           </div>
           

@@ -202,10 +202,16 @@ INSERT INTO team_members (name, role, specialization, image_url, bio, email) VAL
 
 -- Sample site settings
 INSERT INTO site_settings (setting_key, setting_value, description) VALUES
-('site_title', 'Sreca - Organizacija za djecu sa invaliditetom', 'Naslov sajta'),
+('site_title', 'Udruženje "Sreća za sve" - Travnik', 'Naslov sajta'),
 ('contact_email', 'info@sreca.org', 'Glavni email za kontakt'),
-('contact_phone', '+387 33 123 456', 'Glavni telefon za kontakt'),
-('address', 'Sarajevo, Bosna i Hercegovina', 'Adresa organizacije'),
+('contact_email_secondary', 'husrecazasve@gmail.com', 'Sekundarni email za kontakt'),
+('contact_phone', '062 338 910', 'Glavni telefon za kontakt'),
+('address', 'Pasamahala br. 272', 'Adresa organizacije'),
+('city', '72270 Travnik', 'Grad organizacije'),
+('country', 'Bosna i Hercegovina', 'Država'),
+('id_number', '4236699600006', 'ID broj organizacije'),
+('bank_name', 'UniCredit Bank', 'Naziv banke'),
+('bank_account', '3386702240352380', 'Broj računa'),
 ('facebook_url', 'https://facebook.com/sreca', 'Facebook stranica'),
 ('linkedin_url', 'https://linkedin.com/company/sreca', 'LinkedIn stranica');
 

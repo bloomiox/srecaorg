@@ -4,7 +4,7 @@ import {
   getNews, createNews, updateNews, deleteNews,
   getEvents, createEvent, updateEvent, deleteEvent,
   getTeamMembers, createTeamMember, updateTeamMember, deleteTeamMember,
-  getEventRegistrations, getContactSubmissions, updateContactSubmission, deleteContactSubmission,
+  getEventRegistrations, getContactSubmissions,
   getSiteSettings, updateSiteSetting,
   getDonors, createDonor, updateDonor, deleteDonor,
   getDonations, createDonation,
@@ -541,7 +541,7 @@ const ContentManagement: React.FC = () => {
     setSaveMessage('');
     try {
       const promises = Object.entries(formData).map(([key, value]) => 
-        updateSiteSetting(key, value as string)
+        updateSiteSetting(key, value)
       );
       await Promise.all(promises);
       setSettings({...formData});
@@ -1514,11 +1514,6 @@ const CRMManagement: React.FC = () => {
     donationDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
-  
-  // Donor Details Modal State
-  const [selectedDonor, setSelectedDonor] = useState<any>(null);
-  const [showDonorDetails, setShowDonorDetails] = useState(false);
-  const [donorDetailsTab, setDonorDetailsTab] = useState<'info' | 'donations' | 'history'>('info');
 
   useEffect(() => {
     loadData();
@@ -1633,61 +1628,6 @@ const CRMManagement: React.FC = () => {
       notes: ''
     });
     setShowDonationForm(false);
-  };
-
-  const handleViewDonorDetails = (donor: any) => {
-    setSelectedDonor(donor);
-    setShowDonorDetails(true);
-    setDonorDetailsTab('info');
-  };
-
-  const closeDonorDetails = () => {
-    setSelectedDonor(null);
-    setShowDonorDetails(false);
-  };
-
-  // Get donations for selected donor
-  const getDonorDonations = (donorId: number) => {
-    return donations.filter(donation => donation.donor_id === donorId);
-  };
-
-  // Contact management functions
-  const handleArchiveContact = async (id: number) => {
-    try {
-      await updateContactSubmission(id, { status: 'archived' });
-      await loadData();
-    } catch (error) {
-      console.error('Error archiving contact:', error);
-    }
-  };
-
-  const handleDeleteContact = async (id: number) => {
-    if (confirm('Da li ste sigurni da želite obrisati ovu poruku? Ova akcija se ne može poništiti.')) {
-      try {
-        await deleteContactSubmission(id);
-        await loadData();
-      } catch (error) {
-        console.error('Error deleting contact:', error);
-      }
-    }
-  };
-
-  const handleMarkAsRead = async (id: number) => {
-    try {
-      await updateContactSubmission(id, { status: 'read' });
-      await loadData();
-    } catch (error) {
-      console.error('Error marking contact as read:', error);
-    }
-  };
-
-  const handleMarkAsResponded = async (id: number) => {
-    try {
-      await updateContactSubmission(id, { status: 'responded' });
-      await loadData();
-    } catch (error) {
-      console.error('Error marking contact as responded:', error);
-    }
   };
 
   if (loading) return <div className="p-6">Učitavanje CRM podataka...</div>;
@@ -2008,7 +1948,7 @@ const CRMManagement: React.FC = () => {
                 : 'border-transparent text-gray-500'
             }`}
           >
-            Kontakt poruke ({contacts.filter(c => c.status !== 'archived').length})
+            Kontakt poruke ({contacts.length})
           </button>
           <button
             onClick={() => setActiveTab('documents')}
@@ -2428,12 +2368,9 @@ const CRMManagement: React.FC = () => {
               </div>
               <div className="divide-y max-h-96 overflow-y-auto">
                 {filteredDonors.map((donor) => (
-                  <div key={donor.id} className="p-4 flex justify-between items-start hover:bg-gray-50 transition-colors">
-                    <div 
-                      className="flex-1 cursor-pointer" 
-                      onClick={() => handleViewDonorDetails(donor)}
-                    >
-                      <h4 className="font-medium text-brand-blue hover:text-blue-700">
+                  <div key={donor.id} className="p-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <h4 className="font-medium">
                         {donor.donor_type === 'individual' 
                           ? `${donor.first_name} ${donor.last_name}`
                           : donor.organization_name || `${donor.first_name} ${donor.last_name}`
@@ -2446,19 +2383,9 @@ const CRMManagement: React.FC = () => {
                         <p className="text-xs font-medium text-green-600">
                           Ukupno: {donor.total_donated.toFixed(2)} BAM
                         </p>
-                        <span className="text-xs text-gray-400">•</span>
-                        <p className="text-xs text-gray-500">
-                          {getDonorDonations(donor.id).length} donacija
-                        </p>
                       </div>
                     </div>
                     <div className="flex space-x-2 ml-4">
-                      <button
-                        onClick={() => handleViewDonorDetails(donor)}
-                        className="text-brand-blue hover:text-blue-800 text-sm font-medium"
-                      >
-                        Detalji
-                      </button>
                       <button
                         onClick={() => handleEditDonor(donor)}
                         className="text-blue-600 hover:text-blue-800 text-sm"
@@ -2534,19 +2461,13 @@ const CRMManagement: React.FC = () => {
                           {parseFloat(donation.amount).toFixed(2)} {donation.currency}
                         </h4>
                         <p className="text-sm text-gray-600">
-                          {donation.donors ? (
-                            <button
-                              onClick={() => handleViewDonorDetails(donation.donors)}
-                              className="text-brand-blue hover:text-blue-700 hover:underline"
-                            >
-                              {donation.donors.donor_type === 'individual'
+                          {donation.donors 
+                            ? (donation.donors.donor_type === 'individual'
                                 ? `${donation.donors.first_name} ${donation.donors.last_name}`
                                 : donation.donors.organization_name || `${donation.donors.first_name} ${donation.donors.last_name}`
-                              }
-                            </button>
-                          ) : (
-                            'Anonimna donacija'
-                          )}
+                              )
+                            : 'Anonimna donacija'
+                          }
                         </p>
                       </div>
                       <div className="text-right">
@@ -2575,472 +2496,44 @@ const CRMManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Donor Details Modal */}
-      {showDonorDetails && selectedDonor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-brand-blue to-indigo-600 text-white p-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold">
-                    {selectedDonor.donor_type === 'individual' 
-                      ? `${selectedDonor.first_name} ${selectedDonor.last_name}`
-                      : selectedDonor.organization_name || `${selectedDonor.first_name} ${selectedDonor.last_name}`
-                    }
-                  </h2>
-                  <p className="text-blue-100 mt-1 capitalize">{selectedDonor.donor_type}</p>
-                </div>
-                <button
-                  onClick={closeDonorDetails}
-                  className="text-white hover:text-gray-200 text-2xl font-bold"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Navigation */}
-            <div className="border-b bg-gray-50">
-              <div className="flex space-x-0">
-                <button
-                  onClick={() => setDonorDetailsTab('info')}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    donorDetailsTab === 'info'
-                      ? 'bg-white text-brand-blue border-b-2 border-brand-blue'
-                      : 'text-gray-600 hover:text-brand-blue'
-                  }`}
-                >
-                  <span className="mr-2">👤</span>
-                  Osnovne informacije
-                </button>
-                <button
-                  onClick={() => setDonorDetailsTab('donations')}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    donorDetailsTab === 'donations'
-                      ? 'bg-white text-brand-blue border-b-2 border-brand-blue'
-                      : 'text-gray-600 hover:text-brand-blue'
-                  }`}
-                >
-                  <span className="mr-2">💰</span>
-                  Donacije ({getDonorDonations(selectedDonor.id).length})
-                </button>
-                <button
-                  onClick={() => setDonorDetailsTab('history')}
-                  className={`px-6 py-4 font-medium transition-colors ${
-                    donorDetailsTab === 'history'
-                      ? 'bg-white text-brand-blue border-b-2 border-brand-blue'
-                      : 'text-gray-600 hover:text-brand-blue'
-                  }`}
-                >
-                  <span className="mr-2">📊</span>
-                  Statistike
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              {donorDetailsTab === 'info' && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl">
-                      <h3 className="text-lg font-bold text-brand-blue mb-4 flex items-center">
-                        <span className="mr-2">📋</span>
-                        Kontakt informacije
-                      </h3>
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Email:</label>
-                          <p className="text-gray-800">{selectedDonor.email}</p>
-                        </div>
-                        {selectedDonor.phone && (
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Telefon:</label>
-                            <p className="text-gray-800">{selectedDonor.phone}</p>
-                          </div>
-                        )}
-                        {selectedDonor.address && (
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Adresa:</label>
-                            <p className="text-gray-800">
-                              {selectedDonor.address}
-                              {selectedDonor.city && `, ${selectedDonor.city}`}
-                              {selectedDonor.postal_code && ` ${selectedDonor.postal_code}`}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl">
-                      <h3 className="text-lg font-bold text-green-600 mb-4 flex items-center">
-                        <span className="mr-2">💝</span>
-                        Pregled donacija
-                      </h3>
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Ukupno donirano:</label>
-                          <p className="text-2xl font-bold text-green-600">
-                            {selectedDonor.total_donated.toFixed(2)} BAM
-                          </p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Broj donacija:</label>
-                          <p className="text-xl font-semibold text-gray-800">
-                            {getDonorDonations(selectedDonor.id).length}
-                          </p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Registrovan:</label>
-                          <p className="text-gray-800">
-                            {new Date(selectedDonor.created_at).toLocaleDateString('bs-BA')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {selectedDonor.notes && (
-                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-xl">
-                      <h3 className="text-lg font-bold text-amber-600 mb-4 flex items-center">
-                        <span className="mr-2">📝</span>
-                        Napomene
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">{selectedDonor.notes}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {donorDetailsTab === 'donations' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-gray-800">
-                      Sve donacije ({getDonorDonations(selectedDonor.id).length})
-                    </h3>
-                    <button
-                      onClick={() => {
-                        setDonationFormData({...donationFormData, donorId: selectedDonor.id.toString()});
-                        setShowDonationForm(true);
-                        closeDonorDetails();
-                      }}
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                    >
-                      + Dodaj donaciju
-                    </button>
-                  </div>
-                  
-                  {getDonorDonations(selectedDonor.id).length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="text-4xl mb-4">💰</div>
-                      <p className="text-gray-500">Nema zabilježenih donacija</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {getDonorDonations(selectedDonor.id)
-                        .sort((a, b) => new Date(b.donation_date).getTime() - new Date(a.donation_date).getTime())
-                        .map((donation) => (
-                          <div key={donation.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-3 mb-2">
-                                  <span className="text-2xl font-bold text-green-600">
-                                    {parseFloat(donation.amount).toFixed(2)} {donation.currency}
-                                  </span>
-                                  <span className={`px-3 py-1 text-xs rounded-full font-medium ${
-                                    donation.payment_status === 'completed' 
-                                      ? 'bg-green-100 text-green-800'
-                                      : donation.payment_status === 'failed'
-                                      ? 'bg-red-100 text-red-800'
-                                      : 'bg-yellow-100 text-yellow-800'
-                                  }`}>
-                                    {donation.payment_status}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div>
-                                    <span className="text-gray-600">Datum:</span>
-                                    <span className="ml-2 font-medium">
-                                      {new Date(donation.donation_date).toLocaleDateString('bs-BA')}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-600">Svrha:</span>
-                                    <span className="ml-2 font-medium capitalize">{donation.purpose}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-600">Način plaćanja:</span>
-                                    <span className="ml-2 font-medium">{donation.payment_method}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-600">Tip:</span>
-                                    <span className="ml-2 font-medium">{donation.donation_type}</span>
-                                  </div>
-                                </div>
-                                {donation.notes && (
-                                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-gray-600 text-sm">Napomena:</span>
-                                    <p className="text-gray-700 text-sm mt-1">{donation.notes}</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {donorDetailsTab === 'history' && (
-                <div className="space-y-6">
-                  <h3 className="text-lg font-bold text-gray-800">Statistike donacija</h3>
-                  
-                  {(() => {
-                    const donorDonations = getDonorDonations(selectedDonor.id);
-                    const totalAmount = donorDonations.reduce((sum, d) => sum + parseFloat(d.amount), 0);
-                    const avgDonation = donorDonations.length > 0 ? totalAmount / donorDonations.length : 0;
-                    const completedDonations = donorDonations.filter(d => d.payment_status === 'completed');
-                    const purposeStats = donorDonations.reduce((acc, d) => {
-                      acc[d.purpose] = (acc[d.purpose] || 0) + parseFloat(d.amount);
-                      return acc;
-                    }, {} as Record<string, number>);
-                    
-                    return (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl">
-                          <h4 className="font-bold text-brand-blue mb-4">Opće statistike</h4>
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Ukupno donacija:</span>
-                              <span className="font-bold">{donorDonations.length}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Završene donacije:</span>
-                              <span className="font-bold text-green-600">{completedDonations.length}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Prosječna donacija:</span>
-                              <span className="font-bold">{avgDonation.toFixed(2)} BAM</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Prva donacija:</span>
-                              <span className="font-bold">
-                                {donorDonations.length > 0 
-                                  ? new Date(Math.min(...donorDonations.map(d => new Date(d.donation_date).getTime()))).toLocaleDateString('bs-BA')
-                                  : 'N/A'
-                                }
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl">
-                          <h4 className="font-bold text-green-600 mb-4">Donacije po svrsi</h4>
-                          <div className="space-y-3">
-                            {Object.entries(purposeStats).map(([purpose, amount]) => (
-                              <div key={purpose} className="flex justify-between">
-                                <span className="text-gray-600 capitalize">{purpose}:</span>
-                                <span className="font-bold">{amount.toFixed(2)} BAM</span>
-                              </div>
-                            ))}
-                            {Object.keys(purposeStats).length === 0 && (
-                              <p className="text-gray-500 text-center">Nema podataka</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="border-t bg-gray-50 px-6 py-4">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600">
-                  Donator ID: {selectedDonor.id}
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => {
-                      handleEditDonor(selectedDonor);
-                      closeDonorDetails();
-                    }}
-                    className="bg-brand-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    Uredi donatora
-                  </button>
-                  <button
-                    onClick={closeDonorDetails}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    Zatvori
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {activeTab === 'contacts' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="p-4 border-b">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold">Kontakt poruke ({contacts.length})</h3>
-                <div className="text-sm text-gray-600">
-                  <span className="mr-4">
-                    Nove: {contacts.filter(c => c.status === 'new').length}
-                  </span>
-                  <span className="mr-4">
-                    Pročitane: {contacts.filter(c => c.status === 'read').length}
-                  </span>
-                  <span>
-                    Odgovorene: {contacts.filter(c => c.status === 'responded').length}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="divide-y">
-              {contacts.filter(contact => contact.status !== 'archived').map((contact) => (
-                <div key={contact.id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h4 className="font-bold text-lg text-gray-800">{contact.name}</h4>
-                        <span className={`px-3 py-1 text-xs rounded-full font-medium ${
-                          contact.status === 'responded' 
-                            ? 'bg-green-100 text-green-800'
-                            : contact.status === 'read'
-                            ? 'bg-blue-100 text-blue-800'
-                            : contact.status === 'archived'
-                            ? 'bg-gray-100 text-gray-600'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {contact.status === 'new' ? 'Nova' : 
-                           contact.status === 'read' ? 'Pročitana' :
-                           contact.status === 'responded' ? 'Odgovorena' : 
-                           contact.status === 'archived' ? 'Arhivirana' : contact.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                        <span className="flex items-center">
-                          <span className="mr-1">✉️</span>
-                          {contact.email}
-                        </span>
-                        {contact.phone && (
-                          <span className="flex items-center">
-                            <span className="mr-1">📞</span>
-                            {contact.phone}
-                          </span>
-                        )}
-                        <span className="flex items-center">
-                          <span className="mr-1">📅</span>
-                          {new Date(contact.submitted_at).toLocaleDateString('bs-BA')}
-                        </span>
-                      </div>
-                      {contact.subject && (
-                        <p className="text-lg font-semibold text-brand-blue mb-2">{contact.subject}</p>
-                      )}
-                      <p className="text-gray-700 leading-relaxed">{contact.message}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
-                    {contact.status === 'new' && (
-                      <button
-                        onClick={() => handleMarkAsRead(contact.id)}
-                        className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        Označi kao pročitano
-                      </button>
-                    )}
-                    {(contact.status === 'new' || contact.status === 'read') && (
-                      <button
-                        onClick={() => handleMarkAsResponded(contact.id)}
-                        className="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        Označi kao odgovoreno
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleArchiveContact(contact.id)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Arhiviraj
-                    </button>
-                    <button
-                      onClick={() => handleDeleteContact(contact.id)}
-                      className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Obriši
-                    </button>
-                  </div>
-                </div>
-              ))}
-              
-              {contacts.filter(contact => contact.status !== 'archived').length === 0 && (
-                <div className="p-8 text-center">
-                  <div className="text-4xl mb-4">📧</div>
-                  <p className="text-gray-500">Nema aktivnih kontakt poruka</p>
-                </div>
-              )}
-            </div>
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-4 border-b">
+            <h3 className="font-semibold">Kontakt poruke</h3>
           </div>
-
-          {/* Archived Messages Section */}
-          {contacts.filter(contact => contact.status === 'archived').length > 0 && (
-            <div className="bg-white rounded-lg shadow-sm">
-              <div className="p-4 border-b">
-                <h3 className="font-semibold text-gray-600">
-                  Arhivirane poruke ({contacts.filter(contact => contact.status === 'archived').length})
-                </h3>
-              </div>
-              <div className="divide-y">
-                {contacts.filter(contact => contact.status === 'archived').map((contact) => (
-                  <div key={contact.id} className="p-4 bg-gray-50">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h4 className="font-medium text-gray-700">{contact.name}</h4>
-                          <span className="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-600">
-                            Arhivirana
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600">{contact.email}</p>
-                        {contact.subject && (
-                          <p className="text-sm font-medium text-gray-700 mt-1">{contact.subject}</p>
-                        )}
-                      </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => updateContactSubmission(contact.id, { status: 'read' }).then(() => loadData())}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          Vrati
-                        </button>
-                        <button
-                          onClick={() => handleDeleteContact(contact.id)}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          Obriši
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 truncate">{contact.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">
+          <div className="divide-y">
+            {contacts.map((contact) => (
+              <div key={contact.id} className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-medium">{contact.name}</h4>
+                    <p className="text-sm text-gray-600">{contact.email}</p>
+                    {contact.phone && (
+                      <p className="text-sm text-gray-600">{contact.phone}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">
                       {new Date(contact.submitted_at).toLocaleDateString('bs-BA')}
                     </p>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      contact.status === 'responded' 
+                        ? 'bg-green-100 text-green-800'
+                        : contact.status === 'read'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {contact.status}
+                    </span>
                   </div>
-                ))}
+                </div>
+                {contact.subject && (
+                  <p className="text-sm font-medium mb-1">{contact.subject}</p>
+                )}
+                <p className="text-sm text-gray-700">{contact.message}</p>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       )}
 
@@ -3225,19 +2718,19 @@ const AnalyticsManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Analitika i izvještaji</h2>
-        <select
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d' | '1y')}
-          className="px-3 py-2 border rounded-lg"
-        >
-          <option value="7d">Zadnjih 7 dana</option>
-          <option value="30d">Zadnjih 30 dana</option>
-          <option value="90d">Zadnjih 90 dana</option>
-          <option value="1y">Zadnja godina</option>
-        </select>
-      </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Analitika i izvještaji</h2>
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d' | '1y')}
+            className="px-3 py-2 border rounded-lg"
+          >
+            <option value="7d">Zadnjih 7 dana</option>
+            <option value="30d">Zadnjih 30 dana</option>
+            <option value="90d">Zadnjih 90 dana</option>
+            <option value="1y">Zadnja godina</option>
+          </select>
+        </div>
 
       {/* Enhanced KPI Cards with Growth */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -3410,6 +2903,59 @@ const AnalyticsManagement: React.FC = () => {
     </div>
   );
 };
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Registracije</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalRegistrations}</p>
+            </div>
+            <div className="bg-teal-100 p-3 rounded-full">
+              <span className="text-2xl">👥</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Kontakt poruke</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalContacts}</p>
+            </div>
+            <div className="bg-blue-100 p-3 rounded-full">
+              <span className="text-2xl">📧</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-4 border-b">
+          <h3 className="font-semibold">Nedavna aktivnost</h3>
+        </div>
+        <div className="divide-y">
+          {stats.recentActivity.map((activity, index) => (
+            <div key={index} className="p-4 flex items-center space-x-3">
+              <div className={`p-2 rounded-full ${
+                activity.type === 'registration' 
+                  ? 'bg-teal-100' 
+                  : 'bg-blue-100'
+              }`}>
+                <span className="text-sm">
+                  {activity.type === 'registration' ? '👤' : '📧'}
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm">{activity.description}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(activity.date).toLocaleString('bs-BA')}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Settings Management Component
 const SettingsManagement: React.FC = () => {
@@ -3444,7 +2990,9 @@ const SettingsManagement: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="p-6">Učitavanje postavki...</div>;
+  if (loading) {
+    return <div className="p-6">Učitavanje postavki...</div>;
+  }
 
   return (
     <div>
@@ -3696,33 +3244,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-gray-100 z-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-blue via-indigo-600 to-brand-blue text-white px-8 py-6 shadow-lg">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">SRECA</h1>
-            <p className="text-blue-100 mt-1">Admin Panel - Dobrodošli, admin@sreca.org</p>
-          </div>
-          <div className="flex space-x-3">
-            <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 px-6 py-3 rounded-xl text-sm font-semibold flex items-center transition-all duration-300 border border-white/20">
-              <span className="mr-2 text-lg">👁</span>
-              Pregled sajta
-            </button>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                onClose();
-              }}
-              className="bg-red-500/80 hover:bg-red-600 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300"
-            >
-              Odjava
-            </button>
-          </div>
+      <div className="bg-brand-blue text-white px-6 py-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">SRECA</h1>
+          <p className="text-sm opacity-90">Admin Panel - Dobrodošli, admin@sreca.org</p>
+        </div>
+        <div className="flex space-x-2">
+          <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm flex items-center">
+            <span className="mr-2">👁</span>
+            Pregled sajta
+          </button>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              onClose();
+            }}
+            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm"
+          >
+            Odjava
+          </button>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 px-8 shadow-sm">
-        <div className="flex space-x-2 overflow-x-auto">
+      <div className="bg-white border-b px-6">
+        <div className="flex space-x-8">
           {[
             { key: 'dashboard', label: 'Dashboard', icon: '📊' },
             { key: 'news', label: 'Novosti', icon: '📰' },
@@ -3736,12 +3282,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`py-4 px-6 rounded-t-xl text-sm font-semibold flex items-center space-x-2 transition-all duration-300 whitespace-nowrap ${activeTab === tab.key
-                  ? 'bg-white text-brand-blue shadow-lg border-t-2 border-brand-blue -mb-px'
-                  : 'text-gray-600 hover:text-brand-blue hover:bg-white/50'
+              className={`py-4 px-2 border-b-2 text-sm font-medium flex items-center space-x-2 ${activeTab === tab.key
+                  ? 'border-brand-blue text-brand-blue'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
             >
-              <span className="text-lg">{tab.icon}</span>
+              <span>{tab.icon}</span>
               <span>{tab.label}</span>
             </button>
           ))}
@@ -3749,81 +3295,62 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       </div>
 
       {/* Content Area */}
-      <div className="p-8 overflow-y-auto bg-gray-50" style={{ height: 'calc(100vh - 160px)' }}>
+      <div className="p-6 overflow-y-auto" style={{ height: 'calc(100vh - 140px)' }}>
         {activeTab === 'dashboard' && (
           <div>
             {/* Welcome Section */}
-            <div className="bg-gradient-to-br from-brand-blue via-indigo-600 to-brand-blue text-white rounded-2xl p-8 mb-8 shadow-xl">
-              <div className="flex items-center mb-4">
-                <span className="text-4xl mr-4">🎯</span>
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">Dobrodošli u Admin Panel</h2>
-                  <p className="text-blue-100 text-lg">Upravljajte sadržajem vašeg sajta, pratite statistike i održavajte kvalitet informacija.</p>
-                </div>
-              </div>
+            <div className="bg-gradient-to-r from-brand-blue to-blue-600 text-white rounded-lg p-6 mb-6">
+              <h2 className="text-2xl font-bold mb-2">Dobrodošli u Admin Panel</h2>
+              <p>Upravljajte sadržajem vašeg sajta, pratite statistike i održavajte kvalitet informacija.</p>
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center mb-6">
-                  <span className="text-3xl mr-3">📝</span>
-                  <h3 className="text-xl font-bold text-gray-800">Upravljanje sadržajem</h3>
-                </div>
-                <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="font-semibold mb-4">Upravljanje sadržajem</h3>
+                <div className="space-y-2">
                   <button 
                     onClick={() => setActiveTab('content')}
-                    className="w-full text-left p-4 hover:bg-blue-50 rounded-xl transition-all duration-300 flex items-center space-x-3 group"
+                    className="w-full text-left p-2 hover:bg-gray-50 rounded"
                   >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">📄</span>
-                    <span className="font-medium text-gray-700 group-hover:text-brand-blue">Uredi postavke sajta</span>
+                    📝 Uredi postavke sajta
                   </button>
                   <button 
                     onClick={() => setActiveTab('news')}
-                    className="w-full text-left p-4 hover:bg-blue-50 rounded-xl transition-all duration-300 flex items-center space-x-3 group"
+                    className="w-full text-left p-2 hover:bg-gray-50 rounded"
                   >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">📰</span>
-                    <span className="font-medium text-gray-700 group-hover:text-brand-blue">Upravljaj novostima</span>
+                    📰 Upravljaj novostima
                   </button>
                   <button 
                     onClick={() => setActiveTab('events')}
-                    className="w-full text-left p-4 hover:bg-blue-50 rounded-xl transition-all duration-300 flex items-center space-x-3 group"
+                    className="w-full text-left p-2 hover:bg-gray-50 rounded"
                   >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">🎓</span>
-                    <span className="font-medium text-gray-700 group-hover:text-brand-blue">Upravljaj događajima</span>
+                    🎓 Upravljaj događajima
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center mb-6">
-                  <span className="text-3xl mr-3">👥</span>
-                  <h3 className="text-xl font-bold text-gray-800">Tim i kontakti</h3>
-                </div>
-                <div className="space-y-3">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="font-semibold mb-4">Tim i kontakti</h3>
+                <div className="space-y-2">
                   <button 
                     onClick={() => setActiveTab('team')}
-                    className="w-full text-left p-4 hover:bg-green-50 rounded-xl transition-all duration-300 flex items-center space-x-3 group"
+                    className="w-full text-left p-2 hover:bg-gray-50 rounded"
                   >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">👤</span>
-                    <span className="font-medium text-gray-700 group-hover:text-green-600">Upravljaj timom</span>
+                    👥 Upravljaj timom
                   </button>
                   <button 
                     onClick={() => setActiveTab('crm')}
-                    className="w-full text-left p-4 hover:bg-green-50 rounded-xl transition-all duration-300 flex items-center space-x-3 group"
+                    className="w-full text-left p-2 hover:bg-gray-50 rounded"
                   >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">📧</span>
-                    <span className="font-medium text-gray-700 group-hover:text-green-600">Kontakt poruke</span>
+                    📧 Kontakt poruke
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center mb-6">
-                  <span className="text-3xl mr-3">📊</span>
-                  <h3 className="text-xl font-bold text-gray-800">Analitika</h3>
-                </div>
-                <div className="space-y-3">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h3 className="font-semibold mb-4">Analitika</h3>
+                <div className="space-y-2">
                   <button 
                     onClick={() => setActiveTab('analytics')}
                     className="w-full text-left p-2 hover:bg-gray-50 rounded"

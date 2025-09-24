@@ -1,10 +1,11 @@
 import React from 'react';
-import { useTeamMembers } from '../../hooks/useSupabaseData';
+import { useTeamMembers, useSiteSettings } from '../../hooks/useSupabaseData';
 import TeamMemberCard from '../TeamMemberCard';
 import PageHeader from '../PageHeader';
 
 const AboutPage: React.FC = () => {
   const { teamMembers } = useTeamMembers();
+  const { settings } = useSiteSettings();
 
   return (
     <div className="animate-fade-in">
@@ -14,30 +15,27 @@ const AboutPage: React.FC = () => {
       />
 
       {/* Naša misija */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
-            <div className="text-gray-700 space-y-6">
-              <h2 className="text-3xl font-bold text-brand-blue mb-4">O nama i našoj misiji</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-16">
+            <div className="text-gray-700 space-y-8">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-bold text-brand-blue mb-6 tracking-tight">O nama i našoj misiji</h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-brand-red to-amber-500 mb-8"></div>
+              </div>
+              <p className="text-xl leading-relaxed text-gray-600">
+                {settings.mission_short || 'Udruženje "Sreća za sve" osnovano je prije šest godina u Travniku s plemenitom misijom: poboljšati kvalitetu života djece s teškoćama u razvoju i osoba s invaliditetom te ih aktivno uključiti u zajednicu.'}
+              </p>
               <p className="text-lg leading-relaxed">
-                Udruženje "Sreća za sve" osnovano je prije šest godina u Travniku s plemenitom misijom: 
-                poboljšati kvalitetu života djece s teškoćama u razvoju i osoba s invaliditetom te ih 
-                aktivno uključiti u zajednicu.
-              </p>
-              <p>
-                Naš rad se temelji na uvjerenju da svako ljudsko biće, bez obzira na izazove s kojima se 
-                suočava, zaslužuje priliku da razvije svoj puni potencijal i živi sretno.
-              </p>
-              <p>
-                Od prvog dana našeg postojanja, fokusirani smo na pružanje <strong>besplatne podrške</strong>, 
-                svjesni da su takve usluge često financijski nedostupne porodicama kojima su najpotrebnije.
+                {settings.mission_full || 'Naš rad se temelji na uvjerenju da svako ljudsko biće, bez obzira na izazove s kojima se suočava, zaslužuje priliku da razvije svoj puni potencijal i živi sretno. Od prvog dana našeg postojanja, fokusirani smo na pružanje besplatne podrške, svjesni da su takve usluge često financijski nedostupne porodicama kojima su najpotrebnije.'}
               </p>
             </div>
-            <div>
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-brand-blue to-brand-lightblue rounded-2xl opacity-20 blur-lg"></div>
               <img
-                src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                src="https://scontent.fach1-1.fna.fbcdn.net/v/t39.30808-6/484325498_938795348470012_5494970943350995240_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=WXTjeBBupC4Q7kNvwHmOM93&_nc_oc=AdnwSM3n5WPFSgSnhxk-q4YZRUqnFxiNKn90-gCh1_Q1iGkfco5PEJoFO0pv7UiJcs4&_nc_zt=23&_nc_ht=scontent.fach1-1.fna&_nc_gid=DRGTWUo7vvPczFJyAJxUww&oh=00_AfashmNjaVJvQim4YguCOoq74US0ERDV0DNMeGesy0W12A&oe=68D9DF1D"
                 alt="Djeca u inkluzivnom okruženju"
-                className="rounded-lg shadow-lg w-full"
+                className="relative rounded-2xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-300"
               />
             </div>
           </div>
@@ -45,74 +43,94 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Statistike */}
-      <section className="py-16 bg-brand-gray">
+      <section className="py-20 bg-gradient-to-br from-brand-blue to-indigo-700 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-brand-blue text-center mb-12">Brojke koje govore za nas</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Brojke koje govore za nas</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-brand-red to-amber-500 mx-auto"></div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-              <div className="text-4xl font-bold text-brand-blue mb-2">800+</div>
-              <p className="text-gray-600">besplatnih individualnih termina godišnje</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-2xl p-10 text-center border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+              <div className="text-5xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-brand-red to-amber-400 bg-clip-text text-transparent">
+                {settings.stats_individual_sessions || '800+'}
+              </div>
+              <p className="text-white/90 text-lg font-medium">besplatnih individualnih termina godišnje</p>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-              <div className="text-4xl font-bold text-brand-blue mb-2">5</div>
-              <p className="text-gray-600">zaposlenih osoba s invaliditetom</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-2xl p-10 text-center border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+              <div className="text-5xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-brand-red to-amber-400 bg-clip-text text-transparent">
+                {settings.stats_employed_disabled || '5'}
+              </div>
+              <p className="text-white/90 text-lg font-medium">zaposlenih osoba s invaliditetom</p>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-              <div className="text-4xl font-bold text-brand-blue mb-2">45+</div>
-              <p className="text-gray-600">organizovanih izleta i druženja</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-2xl p-10 text-center border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+              <div className="text-5xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-brand-red to-amber-400 bg-clip-text text-transparent">
+                {settings.stats_trips || '45+'}
+              </div>
+              <p className="text-white/90 text-lg font-medium">organizovanih izleta i druženja</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Naši programi */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-brand-blue text-center mb-12">Naši ključni programi i aktivnosti</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-6">
-              <div className="bg-brand-gray p-6 rounded-lg">
-                <h3 className="text-xl font-bold text-brand-blue mb-3">Besplatne terapije i radionice</h3>
-                <div className="space-y-3">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-brand-blue mb-6 tracking-tight">Naši ključni programi i aktivnosti</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-brand-red to-amber-500 mx-auto"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-8">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl shadow-lg border border-blue-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <div className="flex items-center mb-4">
+                  <span className="text-4xl mr-4">🎯</span>
+                  <h3 className="text-2xl font-bold text-brand-blue">Besplatne terapije i radionice</h3>
+                </div>
+                <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-gray-800">Individualni termini:</h4>
-                    <p className="text-gray-600">
-                      Kroz personalizovani pristup, naši stručnjaci (psiholog, pedagog, defektolog) 
-                      rade s djecom na razvoju specifičnih vještina.
+                    <h4 className="font-bold text-gray-800 mb-2">Individualni termini:</h4>
+                    <p className="text-gray-600 leading-relaxed">
+                      {settings.individual_sessions_desc || 'Kroz personalizovani pristup, naši stručnjaci (psiholog, pedagog, defektolog) rade s djecom na razvoju specifičnih vještina.'}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Grupne radionice:</h4>
-                    <p className="text-gray-600">
-                      Potičemo razvoj socijalnih vještina, kreativnosti i timskog rada kroz igru i interakciju.
+                    <h4 className="font-bold text-gray-800 mb-2">Grupne radionice:</h4>
+                    <p className="text-gray-600 leading-relaxed">
+                      {settings.group_workshops_desc || 'Potičemo razvoj socijalnih vještina, kreativnosti i timskog rada kroz igru i interakciju.'}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-brand-gray p-6 rounded-lg">
-                <h3 className="text-xl font-bold text-brand-blue mb-3">Psihološka podrška za roditelje</h3>
-                <p className="text-gray-600">
-                  Prepoznajemo izazove s kojima se suočavaju roditelji djece s poteškoćama. 
-                  Nudimo besplatne psihoterapijske sesije i savjetovanja za emocionalnu podršku.
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-2xl shadow-lg border border-green-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <div className="flex items-center mb-4">
+                  <span className="text-4xl mr-4">💚</span>
+                  <h3 className="text-2xl font-bold text-brand-blue">Psihološka podrška za roditelje</h3>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  {settings.psychological_support_desc || 'Prepoznajemo izazove s kojima se suočavaju roditelji djece s poteškoćama. Nudimo besplatne psihoterapijske sesije i savjetovanja za emocionalnu podršku.'}
                 </p>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-brand-gray p-6 rounded-lg">
-                <h3 className="text-xl font-bold text-brand-blue mb-3">Terapijsko jahanje</h3>
-                <p className="text-gray-600">
-                  Terapijsko jahanje je izuzetno korisna aktivnost za poboljšanje fizičkog i 
-                  psihičkog stanja korisnika. I ovu aktivnost nudimo potpuno besplatno našim članovima.
+            <div className="space-y-8">
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-8 rounded-2xl shadow-lg border border-amber-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <div className="flex items-center mb-4">
+                  <span className="text-4xl mr-4">🐎</span>
+                  <h3 className="text-2xl font-bold text-brand-blue">Terapijsko jahanje</h3>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  {settings.therapeutic_riding_desc || 'Terapijsko jahanje je izuzetno korisna aktivnost za poboljšanje fizičkog i psihičkog stanja korisnika. I ovu aktivnost nudimo potpuno besplatno našim članovima.'}
                 </p>
               </div>
 
-              <div className="bg-brand-gray p-6 rounded-lg">
-                <h3 className="text-xl font-bold text-brand-blue mb-3">Izleti, druženja i putovanja</h3>
-                <p className="text-gray-600">
-                  Redovito organiziramo izlete, rođendanske proslave i druženja. Posebno smo ponosni 
-                  na besplatno putovanje na more - za mnoge je to bio prvi put da su vidjeli more.
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-8 rounded-2xl shadow-lg border border-purple-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <div className="flex items-center mb-4">
+                  <span className="text-4xl mr-4">🎉</span>
+                  <h3 className="text-2xl font-bold text-brand-blue">Izleti, druženja i putovanja</h3>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  {settings.trips_desc || 'Redovito organiziramo izlete, rođendanske proslave i druženja. Posebno smo ponosni na besplatno putovanje na more - za mnoge je to bio prvi put da su vidjeli more.'}
                 </p>
               </div>
             </div>
@@ -129,15 +147,13 @@ const AboutPage: React.FC = () => {
               <div className="bg-white bg-opacity-10 p-6 rounded-lg">
                 <h3 className="text-xl font-bold mb-3">Plastenička proizvodnja</h3>
                 <p>
-                  Uzgajamo i prodajemo povrće, a sav prihod usmjeravamo na financiranje naših aktivnosti. 
-                  Ovaj model nam osigurava stabilnost i dokazuje da humanitarni rad može biti samoodrživ.
+                  {settings.self_financing_desc || 'Uzgajamo i prodajemo povrće, a sav prihod usmjeravamo na financiranje naših aktivnosti. Ovaj model nam osigurava stabilnost i dokazuje da humanitarni rad može biti samoodrživ.'}
                 </p>
               </div>
               <div className="bg-white bg-opacity-10 p-6 rounded-lg">
                 <h3 className="text-xl font-bold mb-3">Inkluzivno zapošljavanje</h3>
                 <p>
-                  Kroz saradnju s Fondom za profesionalnu rehabilitaciju, uspješno smo zaposlili osobe 
-                  s invaliditetom. Oni su neprocjenjiv dio našeg tima.
+                  {settings.inclusive_employment_desc || 'Kroz saradnju s Fondom za profesionalnu rehabilitaciju, uspješno smo zaposlili osobe s invaliditetom. Oni su neprocjenjiv dio našeg tima.'}
                 </p>
               </div>
             </div>
@@ -151,20 +167,26 @@ const AboutPage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-brand-blue mb-6">Postanite naš partner</h2>
             <p className="text-lg text-gray-600 mb-8">
-              Naša plastenička proizvodnja osigurava nam dio financijske stabilnosti, ali kontinuiran 
-              rast i širenje programa zahtijeva pouzdanu i dugoročnu podršku. Vaša pomoć nije samo 
-              donacija, već investicija u svjetliju budućnost za našu djecu.
+              {settings.support_message || 'Naša plastenička proizvodnja osigurava nam dio financijske stabilnosti, ali kontinuiran rast i širenje programa zahtijeva pouzdanu i dugoročnu podršku.'} {settings.partnership_cta || 'Vaša pomoć nije samo donacija, već investicija u svjetliju budućnost za našu djecu.'}
             </p>
             <div className="bg-brand-gray p-8 rounded-lg">
               <h3 className="text-xl font-bold text-brand-blue mb-4">Pridružite nam se u našoj misiji!</h3>
               <p className="text-gray-700 mb-6">
-                Spremni smo Vam detaljnije predstaviti naš rad i pokazati kako se svaki vaš doprinos 
-                pretvara u osmijeh i napredak. Vaša podrška bi značila da ne samo pomažete, već 
+                Spremni smo Vam detaljnije predstaviti naš rad i pokazati kako se svaki vaš doprinos
+                pretvara u osmijeh i napredak. Vaša podrška bi značila da ne samo pomažete, već
                 postajete dio promjene, dio priče o uspjehu.
               </p>
-              <button className="bg-brand-blue hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105">
-                Kontaktirajte nas
-              </button>
+              <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
+                <h4 className="text-lg font-bold text-brand-blue mb-3">Kontakt informacije</h4>
+                <div className="space-y-2 text-sm">
+                  <p><strong>Adresa:</strong> {settings.address || 'Pasamahala br. 272'}, {settings.city || '72270 Travnik'}</p>
+                  <p><strong>Telefon:</strong> {settings.contact_phone || '062 338 910'}</p>
+                  <p><strong>Email:</strong> {settings.contact_email || 'info@sreca.org'}</p>
+                  {settings.contact_email_secondary && <p><strong>Email:</strong> {settings.contact_email_secondary}</p>}
+                  <p><strong>ID broj:</strong> {settings.id_number || '4236699600006'}</p>
+                  <p><strong>Račun za donacije:</strong> {settings.bank_name || 'UniCredit Bank'} {settings.bank_account || '3386702240352380'}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

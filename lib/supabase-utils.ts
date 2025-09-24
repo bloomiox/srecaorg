@@ -346,20 +346,53 @@ export const getContactSubmissions = async () => {
   return data || [];
 };
 
+export const updateContactSubmission = async (id: number, updates: { status?: string; notes?: string }) => {
+  const { data, error } = await supabase
+    .from('contact_submissions')
+    .update(updates)
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    console.error('Error updating contact submission:', error);
+    throw error;
+  }
+
+  return data?.[0];
+};
+
+export const deleteContactSubmission = async (id: number) => {
+  const { error } = await supabase
+    .from('contact_submissions')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting contact submission:', error);
+    throw error;
+  }
+};
+
 // Site settings functions
-export const getSiteSettings = async () => {
+export const getSiteSettings = async (): Promise<Record<string, string>> => {
   const { data, error } = await supabase
     .from('site_settings')
-    .select('*');
+    .select('setting_key, setting_value');
 
   if (error) {
     console.error('Error fetching site settings:', error);
+    throw new Error(`Failed to fetch site settings: ${error.message}`);
+  }
+
+  if (!data) {
     return {};
   }
 
   const settings: Record<string, string> = {};
-  data?.forEach(setting => {
-    settings[setting.setting_key] = setting.setting_value;
+  data.forEach(setting => {
+    if (setting.setting_key && setting.setting_value) {
+      settings[setting.setting_key] = setting.setting_value;
+    }
   });
 
   return settings;
@@ -371,7 +404,9 @@ export const updateSiteSetting = async (key: string, value: string) => {
     .upsert([{
       setting_key: key,
       setting_value: value
-    }])
+    }], {
+      onConflict: 'setting_key'
+    })
     .select();
 
   if (error) {
