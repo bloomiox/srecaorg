@@ -1,65 +1,67 @@
 
-import { Page, Course, TeamMember, NewsArticle } from './types';
+import { Page, Event, TeamMember, NewsArticle } from './types';
+import { getEvents, getNews, getTeamMembers } from './lib/supabase-utils';
 
 export const NAV_LINKS = [
   { name: 'Početna', page: Page.Home },
   { name: 'O nama', page: Page.About },
-  { name: 'Kursevi', page: Page.Courses },
+  { name: 'Događaji', page: Page.Events },
   { name: 'Novosti', page: Page.News },
   { name: 'Kontakt', page: Page.Contact },
 ];
 
-export const COURSES_DATA: Course[] = [
+export const EVENTS_DATA: Event[] = [
   {
     id: 1,
-    title: 'Osnovne vještine reanimacije',
-    description: 'Naučite ključne vještine kardiopulmonalne reanimacije (KPR) i korištenja automatskog vanjskog defibrilatora (AVD).',
-    audience: 'Polaznici prve pomoći, studenti, nezdravstveni djelatnici',
-    imageUrl: 'https://inpulsecpr.com/wp-content/uploads/dreamstime_xxl_46129740.jpg',
+    title: 'Radionica inkluzivne igre',
+    description: 'Edukativna radionica za roditelje i djecu o važnosti inkluzivne igre i kako kreirati okruženje gdje se sva djeca osjećaju dobrodošla.',
+    audience: 'Roditelji, djeca, odgajatelji',
+    imageUrl: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     details: {
-      duration: '4 sata',
-      certification: 'Certifikat vrijedi 2 godine',
+      duration: '3 sata',
+      location: 'Centar Sreca, Sarajevo',
       topics: [
-        'Prepoznavanje srčanog zastoja',
-        'Kvalitetna masaža srca',
-        'Primjena umjetnog disanja',
-        'Sigurna uporaba AVD-a',
-        'Zbrinjavanje gušenja'
+        'Principi inkluzivne igre',
+        'Adaptacija igara za djecu sa različitim potrebama',
+        'Kreiranje sigurnog prostora za igru',
+        'Podrška vršnjačkoj interakciji',
+        'Praktične aktivnosti i demonstracije'
       ]
     }
   },
   {
     id: 2,
-    title: 'Napredni kurs oživljavanja',
-    description: 'Kurs za zdravstvene djelatnike koji pokriva napredne tehnike oživljavanja, farmakoterapiju i vođenje tima.',
-    audience: 'Liječnici, medicinske sestre/tehničari',
-    imageUrl: 'https://www.aspenmedical.ae/wp-content/uploads/2024/02/BLS-Left.jpg',
+    title: 'Seminar o pravima djece sa invaliditetom',
+    description: 'Informativni seminar o pravima djece sa invaliditetom, dostupnim uslugama i načinima zagovaranja za bolje uslove.',
+    audience: 'Roditelji, stručnjaci, aktivisti',
+    imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     details: {
-        duration: '2 dana',
-        certification: 'ERC ALS Provider certifikat',
+        duration: '4 sata',
+        location: 'Online i uživo',
         topics: [
-            'Napredno osiguravanje dišnog puta',
-            'Prepoznavanje i terapija poremećaja ritma',
-            'Primjena lijekova u oživljavanju',
-            'Vođenje reanimacijskog tima (CRM)',
-            'Post-reanimacijska skrb'
+            'Konvencija UN o pravima djece sa invaliditetom',
+            'Pravo na obrazovanje i inkluziju',
+            'Pristup zdravstvenim uslugama',
+            'Socijalna zaštita i podrška porodicama',
+            'Zagovaranje i aktivizam'
         ]
     }
   },
   {
     id: 3,
-    title: 'Oživljavanje djece (PLS)',
-    description: 'Specijalizirani kurs usmjeren na specifičnosti kardiopulmonalne reanimacije kod novorođenčadi, dojenčadi i djece.',
-    audience: 'Pedijatri, osoblje hitne pomoći',
-    imageUrl: 'https://www.rrcpr.com/wp-content/uploads/2020/07/BLS_Course.jpg',
+    title: 'Kreativna radionica za djecu',
+    description: 'Zabavna kreativna radionica prilagođena djeci sa različitim sposobnostima, fokusirana na umjetnost, muziku i izražavanje.',
+    audience: 'Djeca sa invaliditetom, braća i sestre',
+    imageUrl: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     details: {
-        duration: '1 dan',
-        certification: 'Certifikat vrijedi 2 godine',
+        duration: '2 sata',
+        location: 'Kreativni centar Sreca',
         topics: [
-            'Specifičnosti dječje anatomije i fiziologije',
-            'Oživljavanje novorođenčeta',
-            'Hitna stanja u pedijatriji',
-            'Timska dinamika'
+            'Slikanje i crtanje prilagođenim tehnikama',
+            'Muzička terapija i ritam',
+            'Kreiranje sa prirodnim materijalima',
+            'Grupne kreativne aktivnosti',
+            'Izložba radova djece'
         ]
     }
   },
@@ -68,64 +70,74 @@ export const COURSES_DATA: Course[] = [
 export const TEAM_DATA: TeamMember[] = [
   {
     id: 1,
-    name: 'Spec. dr. med. Havić Hajrudin',
-    spec: 'Specijalista urgentne medicine',
-    role: 'Osnivač i predsjednik',
-    imageUrl: 'https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/Untitled%20design%20(10).png',
+    name: 'Ana Marić',
+    spec: 'Specijalna pedagoginja',
+    role: 'Osnivačica i direktorica',
+    imageUrl: 'https://images.unsplash.com/photo-1494790108755-2616c6d4e6e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 2,
-    name: 'Spec. dr. med. Amel Mizić',
-    spec: 'Specijalista urgentne medicine',
-    role: 'Sekretar',
-    imageUrl: 'https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/Untitled%20design%20(11).png',
+    name: 'Marko Petrović',
+    spec: 'Socijalni radnik',
+    role: 'Koordinator programa',
+    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
   },
 ];
 
 export const NEWS_DATA: NewsArticle[] = [
   {
     id: 1,
-    title: 'Osnivanje Udruženja',
-    publishDate: '08.08.2025.',
-    shortDescription: 'S ponosom objavljujemo osnivanje Udruženja Resuscitacijski savjet u Bosni i Hercegovini.',
-    fullContent: `Službeno je osnovano Udruženje Resuscitacijski savjet u Bosni i Hercegovini (Удружење Ресусцитацијски савјет у Босни и Херцеговини) dana 08.08.2025. godine.
+    title: 'Osnivanje organizacije Sreca',
+    publishDate: '15.01.2025.',
+    shortDescription: 'S ponosom objavljujemo osnivanje organizacije Sreca - podrška djeci sa invaliditetom i njihovim porodicama.',
+    fullContent: `Službeno je osnovana organizacija Sreca dana 15.01.2025. godine u Sarajevu.
 
-Adresa sjedišta je: Bihać, ulica Jablanska broj 155.
+Naša misija je pružanje sveobuhvatne podrške djeci sa invaliditetom i njihovim porodicama kroz edukaciju, zagovaranje i kreiranje inkluzivnih programa. Vjerujemo da svako dijete zaslužuje priliku da ostvari svoj puni potencijal u podržavajućem okruženju.
 
-Cilj udruženja je promicanje i unaprjeđenje znanja i vještina oživljavanja širom zemlje, u skladu s najnovijim europskim i svjetskim smjernicama. Radujemo se budućim projektima i suradnji sa svim zainteresiranim stranama u svrhu spašavanja života.`,
-    imageUrl: 'https://pub-7d86d5f2e97b46c0a2c2ed8485d9788b.r2.dev/RESUS%20LOGO%20(3).png'
+Radujemo se budućim projektima i suradnji sa svim zainteresiranim stranama u svrhu izgradnje inkluzivnije zajednice za svu djecu.`,
+    imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
   },
    {
     id: 2,
-    title: 'Objavljene nove ERC smjernice za reanimaciju 2025',
-    publishDate: '25.09.2025.',
-    shortDescription: 'Europski Resuscitacijski Savjet (ERC) objavio je ažurirane smjernice. Naše udruženje započinje s implementacijom u sve kurseve.',
-    fullContent: `Kao i svakih pet godina, Europski Resuscitacijski Savjet (ERC) objavio je nove, ažurirane smjernice za oživljavanje. Nove smjernice stavljaju još veći naglasak na kvalitetu masaže srca, timsku suradnju i post-reanimacijsku skrb.
+    title: 'Pokretanje programa inkluzivne igre',
+    publishDate: '20.02.2025.',
+    shortDescription: 'Sreca pokreće novi program inkluzivne igre koji omogućava djeci sa i bez invaliditeta da se igraju zajedno.',
+    fullContent: `Ponosni smo što najavljujemo pokretanje našeg novog programa inkluzivne igre. Ovaj program je dizajniran da omogući djeci sa različitim sposobnostima da se igraju, uče i rastu zajedno.
 
-Naše udruženje, kao punopravni član ERC-a, odmah započinje proces implementacije novih smjernica u sve naše certificirane kurseve. Svi naši instruktori proći će dodatnu obuku kako bi osigurali da polaznici dobiju najsuvremenija znanja i vještine.`,
-    imageUrl: 'https://www.cprguidelines.eu/assets/images/ERC_guidelines_2021_main_visual_twitter-84271032.jpg'
+Program uključuje prilagođene igre, kreativne radionice i aktivnosti koje promiču razumijevanje, empatiju i prijateljstvo među djecom. Naši stručnjaci rade na kreiranju sigurnog i podržavajućeg okruženja gdje se svako dijete osjeća cijenjeno i uključeno.
+
+Pozivamo sve zainteresirane porodice da se pridruže našem programu i budu dio ove važne inicijative.`,
+    imageUrl: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
   },
   {
     id: 3,
-    title: 'Zašto je važna rana defibrilacija? Uloga AVD uređaja.',
-    publishDate: '18.09.2025.',
-    shortDescription: 'Automatski vanjski defibrilator (AVD) je uređaj koji može spasiti život. Saznajte zašto je njegova rana primjena ključna.',
-    fullContent: `Kod iznenadnog srčanog zastoja, srce često uđe u stanje ventrikularne fibrilacije - kaotičnog, neučinkovitog treperenja. Jedini način da se ovaj poremećaj ritma prekine je primjena električnog šoka, odnosno defibrilacije.
+    title: 'Važnost rane intervencije kod djece sa invaliditetom',
+    publishDate: '10.03.2025.',
+    shortDescription: 'Rana intervencija je ključna za razvoj djece sa invaliditetom. Saznajte zašto je važno djelovati na vrijeme.',
+    fullContent: `Rana intervencija predstavlja skup usluga i podrške koje se pružaju djeci sa invaliditetom i njihovim porodicama u najranijim godinama života. Istraživanja pokazuju da je period od rođenja do treće godine života kritičan za razvoj mozga.
 
-Svaka minuta odgode defibrilacije smanjuje šansu za preživljavanje za oko 10%. Zbog toga je postavljanje AVD uređaja na javna mjesta (trgovački centri, zračne luke, sportski objekti) i edukacija laika o njihovoj uporabi od presudne važnosti. AVD uređaji su dizajnirani da budu jednostavni za korištenje i sigurni, te glasovnim uputama vode korisnika kroz cijeli postupak.`,
-    imageUrl: 'https://www.aedsuperstore.com/assets/images/blog/2020/09/aed-shock-button.jpg'
+Ključne prednosti rane intervencije uključuju:
+- Poboljšanje kognitivnih i motoričkih vještina
+- Bolje socijalne i komunikacijske sposobnosti  
+- Veću nezavisnost u svakodnevnim aktivnostima
+- Podršku porodicama u razumijevanju potreba djeteta
+
+Naša organizacija radi na povećanju dostupnosti programa rane intervencije i edukaciji roditelja o važnosti pravovremenog djelovanja.`,
+    imageUrl: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
   },
   {
     id: 4,
-    title: 'Kako prepoznati srčani zastoj i zašto je važno odmah djelovati?',
-    publishDate: '18.09.2025',
-    shortDescription: 'Prepoznavanje znakova srčanog zastoja prvi je korak u lancu preživljavanja. Naučite ključne znakove.',
-    fullContent: `Srčani zastoj je stanje u kojem srce prestaje pumpati krv, što dovodi do prestanka disanja i gubitka svijesti. Ključni znakovi za prepoznavanje su:
+    title: 'Kreiranje inkluzivnih zajednica - vodič za roditelje',
+    publishDate: '25.03.2025',
+    shortDescription: 'Kako možemo zajedno kreirati zajednice gdje se sva djeca osjećaju prihvaćeno i cijenjeno.',
+    fullContent: `Kreiranje inkluzivnih zajednica zahtijeva angažman svih članova društva. Evo kako roditelji mogu doprinijeti:
 
-1.  **Osoba ne reagira:** Ne miče se, ne otvara oči i ne odgovara na dozivanje ili nježno protresanje.
-2.  **Osoba ne diše normalno:** Može prestati disati ili imati agonalne udahe (nepravilno, bučno disanje slično hrkanju ili krkljanju).
+1. **Edukacija i osvještavanje:** Učite o različitim vrstama invaliditeta i načinima podrške.
+2. **Modeliranje ponašanja:** Pokažite svojoj djeci kako da budu inkluzivni i prihvatajući.
+3. **Zagovaranje:** Zagovarajte za inkluzivne politike u školama i zajednici.
+4. **Volontiranje:** Pridružite se organizacijama koje rade na promociji inkluzije.
 
-Ako primijetite ove znakove, odmah pozovite hitnu medicinsku pomoć (124) i započnite s masažom srca. Ne bojte se djelovati - vaša reakcija može spasiti život. Svaka sekunda je važna!`,
-    imageUrl: 'https://www.escardio.org/static-assets/images/cpr-hands-only.jpg'
+Zajedno možemo kreirati svijet gdje svako dijete ima priliku da uspije i bude srećno.`,
+    imageUrl: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
   }
 ].sort((a, b) => new Date(b.publishDate.split('.').reverse().join('-')).getTime() - new Date(a.publishDate.split('.').reverse().join('-')).getTime());

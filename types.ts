@@ -1,24 +1,24 @@
 export enum Page {
   Home = 'Home',
   About = 'About',
-  Courses = 'Courses',
+  Events = 'Events',
   News = 'News',
   Contact = 'Contact',
 }
 
-export interface CourseDetails {
+export interface EventDetails {
   duration: string;
-  certification: string;
+  location: string;
   topics: string[];
 }
 
-export interface Course {
+export interface Event {
   id: number;
   title: string;
   description: string;
   audience: string;
   imageUrl: string;
-  details: CourseDetails;
+  details: EventDetails;
 }
 
 export interface TeamMember {
