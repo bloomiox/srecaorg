@@ -3556,6 +3556,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  // Dashboard data states
+  const [dashboardNews, setDashboardNews] = useState<NewsArticle[]>([]);
+  const [dashboardEvents, setDashboardEvents] = useState<Event[]>([]);
+  const [dashboardRegistrations, setDashboardRegistrations] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
@@ -3585,6 +3590,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load dashboard data when authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      loadDashboardData();
+    }
+  }, [isAuthenticated]);
+
+  const loadDashboardData = async () => {
+    try {
+      // Load latest news (limit to 3)
+      const newsData = await getNews();
+      setDashboardNews(newsData.slice(0, 3));
+
+      // Load events (limit to 3)
+      const eventsData = await getEvents();
+      setDashboardEvents(eventsData.slice(0, 3));
+
+      // Load recent registrations (limit to 3)
+      const registrationsData = await getEventRegistrations();
+      setDashboardRegistrations(registrationsData.slice(0, 3));
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    }
+  };
 
   const handleLogin = async () => {
     setError('');
@@ -3703,7 +3733,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <p className="text-blue-100 mt-1">Admin Panel - Dobrodošli, admin@sreca.org</p>
           </div>
           <div className="flex space-x-3">
-            <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 px-6 py-3 rounded-xl text-sm font-semibold flex items-center transition-all duration-300 border border-white/20">
+            <button 
+              onClick={onClose}
+              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 px-6 py-3 rounded-xl text-sm font-semibold flex items-center transition-all duration-300 border border-white/20"
+            >
               <span className="mr-2 text-lg">👁</span>
               Pregled sajta
             </button>
@@ -3846,36 +3879,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="bg-white rounded-lg shadow-sm">
                 <div className="p-4 border-b flex justify-between items-center">
                   <h3 className="font-semibold">Najnovije novosti</h3>
-                  <button className="text-brand-blue text-sm hover:underline">Prikaži sve →</button>
+                  <button 
+                    onClick={() => setActiveTab('news')}
+                    className="text-brand-blue text-sm hover:underline"
+                  >
+                    Prikaži sve →
+                  </button>
                 </div>
                 <div className="p-4 space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-green-100 p-2 rounded">
-                      <span className="text-sm">📰</span>
+                  {dashboardNews.length > 0 ? (
+                    dashboardNews.map((article) => (
+                      <div key={article.id} className="flex items-start space-x-3">
+                        <div className="bg-green-100 p-2 rounded">
+                          <span className="text-sm">📰</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{article.title}</p>
+                          <p className="text-xs text-gray-500">{article.publishDate}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <p className="text-sm">Nema novosti</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Osnivanje organizacije Sreca</p>
-                      <p className="text-xs text-gray-500">15.01.2025.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-green-100 p-2 rounded">
-                      <span className="text-sm">📰</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Pokretanje programa inkluzivne igre</p>
-                      <p className="text-xs text-gray-500">20.02.2025.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-green-100 p-2 rounded">
-                      <span className="text-sm">📰</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Važnost rane intervencije</p>
-                      <p className="text-xs text-gray-500">10.03.2025.</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -3883,36 +3911,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="bg-white rounded-lg shadow-sm">
                 <div className="p-4 border-b flex justify-between items-center">
                   <h3 className="font-semibold">Popularni događaji</h3>
-                  <button className="text-brand-blue text-sm hover:underline">Prikaži sve →</button>
+                  <button 
+                    onClick={() => setActiveTab('events')}
+                    className="text-brand-blue text-sm hover:underline"
+                  >
+                    Prikaži sve →
+                  </button>
                 </div>
                 <div className="p-4 space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-purple-100 p-2 rounded">
-                      <span className="text-sm">🎓</span>
+                  {dashboardEvents.length > 0 ? (
+                    dashboardEvents.map((event) => (
+                      <div key={event.id} className="flex items-start space-x-3">
+                        <div className="bg-purple-100 p-2 rounded">
+                          <span className="text-sm">🎓</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{event.title}</p>
+                          <p className="text-xs text-gray-500">{event.details.duration}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <p className="text-sm">Nema događaja</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Radionica inkluzivne igre</p>
-                      <p className="text-xs text-gray-500">3 sata</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-purple-100 p-2 rounded">
-                      <span className="text-sm">🎓</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Seminar o pravima djece</p>
-                      <p className="text-xs text-gray-500">4 sata</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-purple-100 p-2 rounded">
-                      <span className="text-sm">🎓</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Kreativna radionica za djecu</p>
-                      <p className="text-xs text-gray-500">2 sata</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -3920,36 +3943,35 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="bg-white rounded-lg shadow-sm">
                 <div className="p-4 border-b flex justify-between items-center">
                   <h3 className="font-semibold">Novi polaznici</h3>
-                  <button className="text-brand-blue text-sm hover:underline">Prikaži sve →</button>
+                  <button 
+                    onClick={() => setActiveTab('crm')}
+                    className="text-brand-blue text-sm hover:underline"
+                  >
+                    Prikaži sve →
+                  </button>
                 </div>
                 <div className="p-4 space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-teal-100 p-2 rounded">
-                      <span className="text-sm">👤</span>
+                  {dashboardRegistrations.length > 0 ? (
+                    dashboardRegistrations.map((registration) => (
+                      <div key={registration.id} className="flex items-start space-x-3">
+                        <div className="bg-teal-100 p-2 rounded">
+                          <span className="text-sm">👤</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">
+                            {registration.first_name} {registration.last_name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {registration.events?.title || 'Nepoznat događaj'}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <p className="text-sm">Nema novih prijava</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Marija Petrović</p>
-                      <p className="text-xs text-gray-500">Radionica inkluzivne igre</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-teal-100 p-2 rounded">
-                      <span className="text-sm">👤</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Ana Marić</p>
-                      <p className="text-xs text-gray-500">Seminar o pravima djece</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-teal-100 p-2 rounded">
-                      <span className="text-sm">👤</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Stefan Nikolić</p>
-                      <p className="text-xs text-gray-500">Kreativna radionica</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
