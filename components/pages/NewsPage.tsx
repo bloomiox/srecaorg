@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { NEWS_DATA } from '../../constants';
+import React, { useState, useEffect } from 'react';
 import { NewsArticle } from '../../types';
+import { getNews } from '../../lib/supabase-utils';
 import PageHeader from '../PageHeader';
 
 interface ArticleListProps {
@@ -70,6 +70,26 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ article, onClose }) => (
 
 const NewsPage: React.FC = () => {
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
+  const [newsData, setNewsData] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const articles = await getNews();
+        setNewsData(articles);
+      } catch (err) {
+        console.error('Error fetching news:', err);
+        setError('Failed to load news articles');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
 
   const handleSelectArticle = (id: number) => {
     setSelectedArticleId(id);
@@ -80,7 +100,7 @@ const NewsPage: React.FC = () => {
     setSelectedArticleId(null);
   };
 
-  const selectedArticle = selectedArticleId ? NEWS_DATA.find(article => article.id === selectedArticleId) : null;
+  const selectedArticle = selectedArticleId ? newsData.find(article => article.id === selectedArticleId) : null;
 
   return (
     <div className="animate-fade-in">
@@ -91,10 +111,24 @@ const NewsPage: React.FC = () => {
 
       <div className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {selectedArticle ? (
+          {loading ? (
+            <div className="flex justify-center items-center min-h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <p className="text-red-600 text-lg">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 bg-brand-blue hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Pokušaj ponovo
+              </button>
+            </div>
+          ) : selectedArticle ? (
             <ArticleDetail article={selectedArticle} onClose={handleCloseArticle} />
           ) : (
-            <ArticleList articles={NEWS_DATA} onSelectArticle={handleSelectArticle} />
+            <ArticleList articles={newsData} onSelectArticle={handleSelectArticle} />
           )}
         </div>
       </div>
