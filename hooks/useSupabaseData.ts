@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Event, NewsArticle, TeamMember } from '../types';
 import { getEvents, getNews, getTeamMembers, getSiteSettings } from '../lib/supabase-utils';
-import { EVENTS_DATA, NEWS_DATA, TEAM_DATA } from '../constants';
+import { EVENTS_DATA, TEAM_DATA } from '../constants';
 
 export const useEvents = () => {
   const [events, setEvents] = useState<Event[]>(EVENTS_DATA);
@@ -32,31 +32,29 @@ export const useEvents = () => {
 };
 
 export const useNews = () => {
-  const [news, setNews] = useState<NewsArticle[]>(NEWS_DATA);
-  const [loading, setLoading] = useState(false);
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      try {
-        const supabaseNews = await getNews();
-        if (supabaseNews.length > 0) {
-          setNews(supabaseNews);
-        }
-      } catch (err) {
-        setError('Failed to load news');
-        console.error('Error loading news:', err);
-        // Keep using static data as fallback
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchNews = async () => {
+    setLoading(true);
+    try {
+      const supabaseNews = await getNews();
+      setNews(supabaseNews);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load news');
+      console.error('Error loading news:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchNews();
   }, []);
 
-  return { news, loading, error, refetch: () => fetchNews() };
+  return { news, loading, error, refetch: fetchNews };
 };
 
 export const useTeamMembers = () => {
